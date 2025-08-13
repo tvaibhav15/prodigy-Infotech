@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather App</title>
+<style>
+    body { font-family: Arial, sans-serif; background: #e3f2fd; text-align: center; padding: 20px; }
+    h1 { color: #1565c0; }
+    input, button { padding: 10px; margin: 5px; border-radius: 5px; border: 1px solid #90caf9; }
+    button { background: #1565c0; color: white; border: none; cursor: pointer; }
+    button:hover { background: #0d47a1; }
+    #weather { margin-top: 20px; padding: 15px; background: white; border-radius: 8px; display: inline-block; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
+</style>
+</head>
+<body>
+
+<h1>Weather App</h1>
+<input type="text" id="city" placeholder="Enter city name">
+<button onclick="getWeatherByCity()">Search</button>
+<button onclick="getWeatherByLocation()">Use My Location</button>
+
+<div id="weather"></div>
+
+<script>
+const apiKey = "YOUR_API_KEY";
+
+function displayWeather(data) {
+    if (data.cod !== 200) {
+        document.getElementById("weather").innerHTML = <p>${data.message}</p>;
+        return;
+    }
+    document.getElementById("weather").innerHTML = `
+        <h2>${data.name}, ${data.sys.country}</h2>
+        <p><b>Temperature:</b> ${(data.main.temp - 273.15).toFixed(1)}°C</p>
+        <p><b>Condition:</b> ${data.weather[0].description}</p>
+        <p><b>Humidity:</b> ${data.main.humidity}%</p>
+        <p><b>Wind Speed:</b> ${data.wind.speed} m/s</p>
+    `;
+}
+
+function getWeatherByCity() {
+    const city = document.getElementById("city").value;
+    if (!city) return alert("Please enter a city name!");
+    fetch(https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey})
+        .then(res => res.json())
+        .then(data => displayWeather(data))
+        .catch(() => alert("Error fetching data"));
+}
+
+function getWeatherByLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            fetch(https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey})
+                .then(res => res.json())
+                .then(data => displayWeather(data))
+                .catch(() => alert("Error fetching data"));
+        });
+    } else {
+        alert("Geolocation not supported by your browser");
+    }
+}
+</script>
+
+</body>
+</html>
